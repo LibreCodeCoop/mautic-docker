@@ -16,6 +16,9 @@ For general questions about this Docker image, please visit [our forum](https://
 
 To reach the developers directly, you can find us in the #docker channel on [Mautic's Slack](https://www.mautic.org/slack/).
 
+> [!NOTE]
+> This fork was made to make possible use xdebug
+
 ## Versions
 
 All Mautic 5 Docker images follow the following naming stategy.
@@ -46,6 +49,7 @@ Each variant contains:
 * the needed dependencies to run Mautic (e.g. PHP modules)
 * the Mautic codebase installed via composer (see mautic/recommended-project)
 * the needed files and configuration to run as a specific role
+* xdebug, npm and composer
 
 See the `examples` explanation below how you could use them.
 
@@ -65,12 +69,12 @@ The `mautic_cron` and `mautic_worker` require the codebase anyhow, as they execu
 The [examples](examples/) folder contains examples of `docker-compose` setups that use the Docker images.
 
 > [!WARNING]
-> The examples **require `docker compose` v2**.  
-> Running the examples with the unsupported `docker-compose` v1 will result in a non-starting web container.  
+> The examples **require `docker compose` v2**.
+> Running the examples with the unsupported `docker-compose` v1 will result in a non-starting web container.
 
 > [!IMPORTANT]
-> Please take into account the purpose of those examples:  
-> it shows how it **could** be used, not how it **should** be used.  
+> Please take into account the purpose of those examples:
+> it shows how it **could** be used, not how it **should** be used.
 > Do not use those examples in production without reviewing, understanding and configuring them.
 
 * `basic`: standard example using the `apache` image with `doctrine` as async queue.
@@ -89,13 +93,19 @@ For each example, there are 2 files where settings can be set:
 You can build your own images easily using the `docker build` command in the root of this directory:
 
 ```
-docker build . -f apache/Dockerfile -t mautic/mautic:5-apache
-docker build . -f fpm/Dockerfile -t mautic/mautic:5-fpm
+docker build . -f Dockerfile.apache -t librecodecoop/mautic:5-apache
+docker build . -f Dockerfile.fpm -t librecodecoop/mautic:5-fpm
 ```
 
 ## Persistent storage
 
 The images by default foresee following volumes to persist data (not taking into account e.g. database or queueing data, as that's not part of these images).
+
+* `/var/www/html`: The root folder of Mautic. This is necessary to xdebug work fine.
+
+## Backup
+
+The mutable data are:
 
  * `config`: the local config folder containing `local.php`, `parameters_local.php`, ...
  * `var/logs`: the folder with logs
@@ -106,8 +116,26 @@ The images by default foresee following volumes to persist data (not taking into
 ### Configuration
 #### Environment Variables
 The following environment variables can be used to configure how your setup should behave.
+You can get all available environments looking at a docker-compose.yml file that have the default values to be possible only run a `docker compose up` (but don't do this in production, please).
 
-##### Mautic Behaviour
+#### MySQL settings
+ - `MYSQL_HOST`: the MySQL host to connect to
+ - `MYSQL_PORT`: the MySQL port to use
+ - `MYSQL_DATABASE`: the database name to be used by Mautic
+ - `MYSQL_USER`: the MySQL user that has access to the database
+ - `MYSQL_PASSWORD`: the password for the MySQL user 
+ - `MYSQL_ROOT_PASSWORD`: the password for the MySQL root user that is able to configure the above users and database
+
+#### PHP settings
+
+ - `PHP_INI_VALUE_DATE_TIMEZONE`: defaults to `UTC`
+ - `PHP_INI_VALUE_MEMORY_LIMIT`: defaults to `512M`
+ - `PHP_INI_VALUE_UPLOAD_MAX_FILESIZE`: defaults to `512M`
+ - `PHP_INI_VALUE_POST_MAX_FILESIZE`: defaults to `512M`
+ - `PHP_INI_VALUE_MAX_EXECUTION_TIME`: defaults to `300`
+ - `XDEBUG_CONFIG`: client_host=172.17.0.1 client_port=9003 start_with_request=yes
+
+#### Mautic behaviour settings
 
  - `MAUTIC_DB_HOST`: IP address or hostname of the MySQL server.
  - `MAUTIC_DB_PORT`: port which the MySQL server is listening on. Defaults to `3306`.
@@ -128,6 +156,8 @@ The following environment variables can be used to configure how your setup shou
    Defaults to `2`
  - `DOCKER_MAUTIC_WORKERS_CONSUME_FAILED`: Number of workers to start consuming failed e-mails.  
    Defaults to `2`
+ - `MAUTIC_MESSENGER_DSN_EMAIL`: DSN to email.
+ - `MAUTIC_MESSENGER_DSN_HIT`: DSN to hit.
 
 ##### PHP Settings
 
@@ -176,47 +206,14 @@ docker compose exec --user www-data --workdir /var/www/html mautic_web /bin/bash
 
 ### Running a Mautic CLI command
 
-```bash
-docker compose exec --user www-data --workdir /var/www/html mautic_web php ./bin/console mautic:install https://mautic.example.com --admin_email="admin@mautic.local" --admin_password="Maut1cR0cks\!"
-```
+## Issues
+
+If you have any problems with or questions about this image, please contact us through a [GitHub issue](https://github.com/librecodecoop/mautic-docker/issues).
+
+You can also reach the Mautic community through its [online forums](https://www.mautic.org/community/) or the [Mautic Slack channel](https://www.mautic.org/slack/).
 
 ## Contributing
 
 You are invited to contribute new features, fixes, or updates, large or small; we are always thrilled to receive pull requests, and do our best to process them as fast as we can.
 
-Before you start to code, we recommend discussing your plans through a [GitHub issue](https://github.com/mautic/docker-mautic/issues), especially for more ambitious contributions. This gives other contributors a chance to point you in the right direction, give you feedback on your design, and help you find out if someone else is working on the same thing.
-
-## Contributors ✨
-
-Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tbody>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/cibero42"><img src="https://avatars.githubusercontent.com/u/102629460?v=4?s=100" width="100px;" alt="Renato"/><br /><sub><b>Renato</b></sub></a><br /><a href="https://github.com/mautic/docker-mautic/commits?author=cibero42" title="Code">💻</a> <a href="https://github.com/mautic/docker-mautic/commits?author=cibero42" title="Documentation">📖</a> <a href="https://github.com/mautic/docker-mautic/pulls?q=is%3Apr+reviewed-by%3Acibero42" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/mautic/docker-mautic/commits?author=cibero42" title="Tests">⚠️</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://academy.leewayweb.com"><img src="https://avatars.githubusercontent.com/u/1532615?v=4?s=100" width="100px;" alt="Mauro Chojrin"/><br /><sub><b>Mauro Chojrin</b></sub></a><br /><a href="https://github.com/mautic/docker-mautic/commits?author=mchojrin" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://okeefe.dev"><img src="https://avatars.githubusercontent.com/u/872224?v=4?s=100" width="100px;" alt="Matt O'Keefe"/><br /><sub><b>Matt O'Keefe</b></sub></a><br /><a href="https://github.com/mautic/docker-mautic/pulls?q=is%3Apr+reviewed-by%3Ao-mutt" title="Reviewed Pull Requests">👀</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://www.4success.com.br"><img src="https://avatars.githubusercontent.com/u/19995615?v=4?s=100" width="100px;" alt="Renan William"/><br /><sub><b>Renan William</b></sub></a><br /><a href="https://github.com/mautic/docker-mautic/commits?author=renanwilliam" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://www.ruthcheesley.co.uk"><img src="https://avatars.githubusercontent.com/u/2930593?v=4?s=100" width="100px;" alt="Ruth Cheesley"/><br /><sub><b>Ruth Cheesley</b></sub></a><br /><a href="https://github.com/mautic/docker-mautic/commits?author=RCheesley" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="http://johnlinhart.com"><img src="https://avatars.githubusercontent.com/u/1235442?v=4?s=100" width="100px;" alt="John Linhart"/><br /><sub><b>John Linhart</b></sub></a><br /><a href="https://github.com/mautic/docker-mautic/pulls?q=is%3Apr+reviewed-by%3Aescopecz" title="Reviewed Pull Requests">👀</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ChiragMoradiya"><img src="https://avatars.githubusercontent.com/u/2399621?v=4?s=100" width="100px;" alt="Chirag Moradiya"/><br /><sub><b>Chirag Moradiya</b></sub></a><br /><a href="https://github.com/mautic/docker-mautic/commits?author=ChiragMoradiya" title="Code">💻</a></td>
-    </tr>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/matbcvo"><img src="https://avatars.githubusercontent.com/u/1006437?v=4?s=100" width="100px;" alt="Martin Vooremäe"/><br /><sub><b>Martin Vooremäe</b></sub></a><br /><a href="https://github.com/mautic/docker-mautic/commits?author=matbcvo" title="Code">💻</a> <a href="https://github.com/mautic/docker-mautic/pulls?q=is%3Apr+reviewed-by%3Amatbcvo" title="Reviewed Pull Requests">👀</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/henmohr"><img src="https://avatars.githubusercontent.com/u/21038820?v=4?s=100" width="100px;" alt="henmohr"/><br /><sub><b>henmohr</b></sub></a><br /><a href="https://github.com/mautic/docker-mautic/pulls?q=is%3Apr+reviewed-by%3Ahenmohr" title="Reviewed Pull Requests">👀</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/maxitromer"><img src="https://avatars.githubusercontent.com/u/6311835?v=4?s=100" width="100px;" alt="maxitromer"/><br /><sub><b>maxitromer</b></sub></a><br /><a href="https://github.com/mautic/docker-mautic/commits?author=maxitromer" title="Code">💻</a> <a href="https://github.com/mautic/docker-mautic/commits?author=maxitromer" title="Tests">⚠️</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/nick-vanpraet"><img src="https://avatars.githubusercontent.com/u/7923739?v=4?s=100" width="100px;" alt="Nick Vanpraet"/><br /><sub><b>Nick Vanpraet</b></sub></a><br /><a href="https://github.com/mautic/docker-mautic/pulls?q=is%3Apr+reviewed-by%3Anick-vanpraet" title="Reviewed Pull Requests">👀</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://druid.fi"><img src="https://avatars.githubusercontent.com/u/1140272?v=4?s=100" width="100px;" alt="Marko Korhonen"/><br /><sub><b>Marko Korhonen</b></sub></a><br /><a href="https://github.com/mautic/docker-mautic/commits?author=back-2-95" title="Code">💻</a></td>
-    </tr>
-  </tbody>
-</table>
-
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+Before you start to code, we recommend discussing your plans through a [GitHub issue](https://github.com/librecodecoop/mautic-docker/issues), especially for more ambitious contributions. This gives other contributors a chance to point you in the right direction, give you feedback on your design, and help you find out if someone else is working on the same thing.
