@@ -73,8 +73,8 @@ The `examples` folder contains examples of `docker-compose` setups that use the 
 You can build your own images easily using the `docker build` command in the root of this directory:
 
 ```
-docker build . -f Dockerfile.apache -t librecodecoop/mautic:5-apache
-docker build . -f Dockerfile.fpm -t librecodecoop/mautic:5-fpm
+docker build . -f Dockerfile.apache -t librecodecoop/mautic:6-apache
+docker build . -f Dockerfile.fpm -t librecodecoop/mautic:6-fpm
 ```
 
 ## Persistent storage
