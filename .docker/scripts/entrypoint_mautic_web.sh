@@ -2,7 +2,12 @@
 
 set -e
 
-chown -R www-data:www-data /var/www/html/config /var/www/html/var/logs /var/www/html/docroot/media
+prepare_install_dirs() {
+	mkdir -p /var/www/html/var/cache /var/www/html/var/logs
+	chown -R www-data:www-data /var/www/html/config /var/www/html/var /var/www/html/docroot/media
+}
+
+prepare_install_dirs
 
 mautic_site_url="${MAUTIC_SITE_URL:-http://localhost}"
 mautic_admin_firstname="${MAUTIC_ADMIN_FIRSTNAME:-Admin}"
@@ -13,23 +18,29 @@ mautic_admin_password="${MAUTIC_ADMIN_PASSWORD:-ChangeMe123!}"
 mautic_db_table_prefix="${MAUTIC_DB_TABLE_PREFIX:-}"
 mautic_db_backup_tables="${MAUTIC_DB_BACKUP_TABLES:-true}"
 mautic_db_backup_prefix="${MAUTIC_DB_BACKUP_PREFIX:-bak_}"
+mautic_force_install="${MAUTIC_FORCE_INSTALL:-false}"
 
 install_mautic() {
-	su -s /bin/bash www-data -c 'php /var/www/html/bin/console mautic:install "$MAUTIC_SITE_URL" --force \
-		--db_driver=pdo_mysql \
-		--db_host="$MAUTIC_DB_HOST" \
-		--db_port="$MAUTIC_DB_PORT" \
-		--db_name="$MAUTIC_DB_DATABASE" \
-		--db_user="$MAUTIC_DB_USER" \
-		--db_password="$MAUTIC_DB_PASSWORD" \
-		--db_table_prefix="$MAUTIC_DB_TABLE_PREFIX" \
-		--db_backup_tables="$MAUTIC_DB_BACKUP_TABLES" \
-		--db_backup_prefix="$MAUTIC_DB_BACKUP_PREFIX" \
-		--admin_firstname="$MAUTIC_ADMIN_FIRSTNAME" \
-		--admin_lastname="$MAUTIC_ADMIN_LASTNAME" \
-		--admin_username="$MAUTIC_ADMIN_USERNAME" \
-		--admin_email="$MAUTIC_ADMIN_EMAIL" \
-		--admin_password="$MAUTIC_ADMIN_PASSWORD"'
+	local mautic_db_name="${MAUTIC_DB_DATABASE:-${MAUTIC_DB_NAME:-mautic}}"
+	local cmd
+
+	printf -v cmd 'php /var/www/html/bin/console mautic:install %q --force --db_driver=pdo_mysql --db_host=%q --db_port=%q --db_name=%q --db_user=%q --db_password=%q --db_table_prefix=%q --db_backup_tables=%q --db_backup_prefix=%q --admin_firstname=%q --admin_lastname=%q --admin_username=%q --admin_email=%q --admin_password=%q' \
+		"$mautic_site_url" \
+		"$MAUTIC_DB_HOST" \
+		"$MAUTIC_DB_PORT" \
+		"$mautic_db_name" \
+		"$MAUTIC_DB_USER" \
+		"$MAUTIC_DB_PASSWORD" \
+		"$mautic_db_table_prefix" \
+		"$mautic_db_backup_tables" \
+		"$mautic_db_backup_prefix" \
+		"$mautic_admin_firstname" \
+		"$mautic_admin_lastname" \
+		"$mautic_admin_username" \
+		"$mautic_admin_email" \
+		"$mautic_admin_password"
+
+	su -s /bin/bash www-data -c "$cmd"
 }
 
 mautic_is_installed() {
@@ -61,6 +72,12 @@ $parameters = array(
 );
 EOF
 fi
+
+if [ "$mautic_force_install" = "true" ]; then
+	rm -f /var/www/html/config/local.php
+fi
+
+prepare_install_dirs
 
 if [ "$MAUTIC_AUTO_INSTALL" = "true" ] && [ -f /var/www/html/config/local.php ]; then
 	if ! mautic_is_installed; then
