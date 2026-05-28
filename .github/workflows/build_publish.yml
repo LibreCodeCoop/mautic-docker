@@ -8,10 +8,10 @@ on:
         required: true
       overwrite_latest_major:
         type: boolean
-        description: "Overwrite latest major tag (e.g.`5`). This should only be checked if you're releasing the latest release."
+        description: "Overwrite latest major tag (e.g.`7`). This should only be checked if you're releasing the latest release."
       overwrite_latest_minor:
         type: boolean
-        description: "Overwrite latest minor tag (e.g.`5.0`). This should only be checked if you're releasing the latest release within the minor release."
+        description: "Overwrite latest minor tag (e.g.`7.0`). This should only be checked if you're releasing the latest release within the minor release."
       tag_as_latest:
         type: boolean
         description: "Tag this release as latest"

@@ -1,14 +1,14 @@
 # Mautic Docker image and examples
 
 > [!NOTE]
-> _This version refers to Docker images and examples for Mautic 5. If you would like information about older versions, see https://github.com/mautic/docker-mautic/tree/mautic4._
+> _This version refers to Docker images and examples for Mautic 7. If you would like information about older versions, see https://github.com/mautic/docker-mautic/tree/mautic4._
 
 > [!NOTE]
 > This fork was made to make possible use xdebug
 
 ## Versions
 
-all Mautic 5 Docker images follow the following naming stategy.
+all Mautic 7 Docker images follow the following naming stategy.
 
 `<major.minor.patch>-<variant>`
 
@@ -18,9 +18,9 @@ There are some defaults if parts are omitted:
 
 some examples:
 
-* `5-apache`: latest stable version of Mautic 5 of the `apache` variant
-* `5.0-fpm`: latest version in the 5.0 minor release in the `fpm` variant 
-* `5.0.3-apache`: specific point release of the `apache` variant
+* `7-apache`: latest stable version of Mautic 7 of the `apache` variant
+* `7.0-fpm`: latest version in the 7.0 minor release in the `fpm` variant 
+* `7.0.3-apache`: specific point release of the `apache` variant
 
 ## Variants
 
@@ -73,8 +73,8 @@ The `examples` folder contains examples of `docker-compose` setups that use the 
 You can build your own images easily using the `docker build` command in the root of this directory:
 
 ```
-docker build . -f Dockerfile.apache -t librecodecoop/mautic:6-apache
-docker build . -f Dockerfile.fpm -t librecodecoop/mautic:6-fpm
+docker build . -f Dockerfile.apache -t librecodecoop/mautic:7-apache
+docker build . -f Dockerfile.fpm -t librecodecoop/mautic:7-fpm
 ```
 
 ## Persistent storage
@@ -144,7 +144,7 @@ See the general Mautic documentation for more info.
 ### Customization
 
 Currently this image has no easy way to extend Mautic (e.g. adding extra `composer` dependencies or installing extra plugins or themes).  
-This is an ongoing effort we hope to support in an upcoming 5.x release.  
+This is an ongoing effort we hope to support in an upcoming 7.x release.  
   
 
 For now, please build your own images based on the official ones to add the needed dependencies, plugins and themes.
