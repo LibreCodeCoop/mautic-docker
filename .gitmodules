@@ -1,0 +1,4 @@
+[submodule "volumes/mautic/docroot/plugins/MauticCrmBundle"]
+	path = volumes/mautic/docroot/plugins/MauticCrmBundle
+	url = https://github.com/mautomic-com/mautic-crm-bundle.git
+	branch = main

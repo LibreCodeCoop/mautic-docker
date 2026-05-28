@@ -168,6 +168,12 @@ MAUTIC_ADMIN_PASSWORD=ChangeMe123!
 
 Use `MAUTIC_FORCE_INSTALL=true` on the first boot when you want to skip the browser installer entirely, or when you are reusing a volume that already contains a partial install state.
 
+This repository also tracks the CRM bundle as a git submodule under `volumes/mautic/docroot/plugins/MauticCrmBundle`. If you clone the repository manually, initialize submodules before starting the stack:
+
+```bash
+git submodule update --init --recursive
+```
+
 ### Customization
 
 Currently this image has no easy way to extend Mautic (e.g. adding extra `composer` dependencies or installing extra plugins or themes).  

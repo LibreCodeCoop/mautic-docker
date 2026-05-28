@@ -43,6 +43,10 @@ install_mautic() {
 	su -s /bin/bash www-data -c "$cmd"
 }
 
+install_mautic_plugins() {
+	su -s /bin/bash www-data -c 'php /var/www/html/bin/console mautic:plugins:install'
+}
+
 mautic_is_installed() {
 	php -r 'if (!file_exists("/var/www/html/config/local.php")) { exit(1); } include "/var/www/html/config/local.php"; exit(isset($parameters["db_driver"], $parameters["site_url"]) ? 0 : 1);'
 }
@@ -96,6 +100,8 @@ if [ "$MAUTIC_AUTO_INSTALL" = "true" ] && [ ! -f /var/www/html/config/local.php 
 	MAUTIC_DB_BACKUP_TABLES="$mautic_db_backup_tables" \
 	MAUTIC_DB_BACKUP_PREFIX="$mautic_db_backup_prefix" \
 	install_mautic
+
+	install_mautic_plugins
 fi
 
 # prepare mautic with test data
@@ -114,6 +120,7 @@ if [ "$DOCKER_MAUTIC_LOAD_TEST_DATA" = "true" ]; then
 		MAUTIC_DB_BACKUP_PREFIX="$mautic_db_backup_prefix" \
 		install_mautic
 	fi
+	install_mautic_plugins
 	su -s /bin/bash www-data -c 'php /var/www/html/bin/console doctrine:fixtures:load -n'
 fi
 
