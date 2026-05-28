@@ -6,6 +6,12 @@
 > [!NOTE]
 > This fork was made to make possible use xdebug
 
+If you want the CRM plugin submodule checked out on clone, use:
+
+```bash
+git clone --recurse-submodules https://github.com/LibreCodeCoop/mautic-docker.git
+```
+
 ## Versions
 
 all Mautic 7 Docker images follow the following naming stategy.
