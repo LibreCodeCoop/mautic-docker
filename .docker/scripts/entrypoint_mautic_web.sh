@@ -48,6 +48,7 @@ install_mautic_plugins() {
 }
 
 mautic_is_installed() {
+	# shellcheck disable=SC2016
 	php -r 'if (!file_exists("/var/www/html/config/local.php")) { exit(1); } include "/var/www/html/config/local.php"; exit(isset($parameters["db_driver"], $parameters["site_url"]) ? 0 : 1);'
 }
 
