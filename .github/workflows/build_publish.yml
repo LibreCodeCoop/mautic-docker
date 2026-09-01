@@ -56,7 +56,7 @@ jobs:
             type=semver,pattern={{version}},value=${{ env.MAUTIC_VERSION }},enable=${{ github.event_name != 'push' || github.ref != 'refs/heads/main' }}
             type=semver,pattern={{major}}.{{minor}},value=${{ env.MAUTIC_VERSION }},enable=${{ github.event_name == 'workflow_dispatch' && inputs.overwrite_latest_minor }}
             type=semver,pattern={{major}},value=${{ env.MAUTIC_VERSION }},enable=${{ github.event_name == 'workflow_dispatch' && inputs.overwrite_latest_major }}
-            type=raw,value=7.x-dev,enable=${{ github.ref == 'refs/heads/main' }},suffix=
+            type=raw,value=7.x-dev,enable=${{ github.ref == 'refs/heads/main' }},suffix=-${{ matrix.image_type }}
             type=raw,value=latest,enable=${{ github.event_name == 'workflow_dispatch' && inputs.tag_as_latest && matrix.image_type == 'apache' }},suffix=
           flavor: |
             latest=false
