@@ -2,9 +2,10 @@ name: Build and publish a Docker image
 
 on:
   push:
+    branches:
+      - main
     tags:
       - '*.*.*'
-      - 'v*.*.*'
   workflow_dispatch:
     inputs:
       mautic_version:
@@ -32,7 +33,7 @@ jobs:
     name: Build image
     runs-on: ubuntu-latest
     env:
-      MAUTIC_VERSION: ${{ github.event_name == 'push' && github.ref_type == 'tag' && github.ref_name || inputs.mautic_version }}
+      MAUTIC_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.mautic_version || (github.ref == 'refs/heads/main' && '7.x-dev') || github.ref_name }}
     strategy:
       fail-fast: false
       matrix:
@@ -52,9 +53,10 @@ jobs:
             ghcr.io/librecodecoop/mautic
           # generate Docker tags based on the following events/attributes
           tags: |
-            type=semver,pattern={{version}},value=${{ env.MAUTIC_VERSION }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ env.MAUTIC_VERSION }},enable=${{ inputs.overwrite_latest_minor }}
-            type=semver,pattern={{major}},value=${{ env.MAUTIC_VERSION }},enable=${{ inputs.overwrite_latest_major }}
+            type=semver,pattern={{version}},value=${{ env.MAUTIC_VERSION }},enable=${{ github.event_name != 'push' || github.ref != 'refs/heads/main' }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ env.MAUTIC_VERSION }},enable=${{ github.event_name == 'workflow_dispatch' && inputs.overwrite_latest_minor }}
+            type=semver,pattern={{major}},value=${{ env.MAUTIC_VERSION }},enable=${{ github.event_name == 'workflow_dispatch' && inputs.overwrite_latest_major }}
+            type=raw,value=7.x-dev,enable=${{ github.ref == 'refs/heads/main' }},suffix=
             type=raw,value=latest,enable=${{ inputs.tag_as_latest && matrix.image_type == 'apache' }},suffix=
           flavor: |
             latest=false
