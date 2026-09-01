@@ -1,6 +1,10 @@
 name: Build and publish a Docker image
 
 on:
+  push:
+    tags:
+      - '*.*.*'
+      - 'v*.*.*'
   workflow_dispatch:
     inputs:
       mautic_version:
@@ -27,6 +31,8 @@ jobs:
   push_to_registry:
     name: Build image
     runs-on: ubuntu-latest
+    env:
+      MAUTIC_VERSION: ${{ github.event_name == 'push' && github.ref_type == 'tag' && github.ref_name || inputs.mautic_version }}
     strategy:
       fail-fast: false
       matrix:
@@ -46,9 +52,9 @@ jobs:
             ghcr.io/librecodecoop/mautic
           # generate Docker tags based on the following events/attributes
           tags: |
-            type=semver,pattern={{version}},value=${{ inputs.mautic_version }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ inputs.mautic_version }},enable=${{ inputs.overwrite_latest_minor }}
-            type=semver,pattern={{major}},value=${{ inputs.mautic_version }},enable=${{ inputs.overwrite_latest_major }}
+            type=semver,pattern={{version}},value=${{ env.MAUTIC_VERSION }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ env.MAUTIC_VERSION }},enable=${{ inputs.overwrite_latest_minor }}
+            type=semver,pattern={{major}},value=${{ env.MAUTIC_VERSION }},enable=${{ inputs.overwrite_latest_major }}
             type=raw,value=latest,enable=${{ inputs.tag_as_latest && matrix.image_type == 'apache' }},suffix=
           flavor: |
             latest=false
@@ -80,12 +86,12 @@ jobs:
           file: .docker/Dockerfile.${{ matrix.image_type }}
           tags: ${{ steps.meta.outputs.tags }}
           build-args: |
-            MAUTIC_VERSION=${{ inputs.mautic_version }}
+            MAUTIC_VERSION=${{ env.MAUTIC_VERSION }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
       - name: Push container image
         uses: docker/build-push-action@v6
-        if: github.ref == 'refs/heads/main' || inputs.publish
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') || inputs.publish
         with:
           push: true
           context: .docker
