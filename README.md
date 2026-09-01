@@ -1,14 +1,20 @@
 # Mautic Docker image and examples
 
 > [!NOTE]
-> _This version refers to Docker images and examples for Mautic 5. If you would like information about older versions, see https://github.com/mautic/docker-mautic/tree/mautic4._
+> _This version refers to Docker images and examples for Mautic 7. If you would like information about older versions, see https://github.com/mautic/docker-mautic/tree/mautic4._
 
 > [!NOTE]
 > This fork was made to make possible use xdebug
 
+If you want the CRM plugin submodule checked out on clone, use:
+
+```bash
+git clone --recurse-submodules https://github.com/LibreCodeCoop/mautic-docker.git
+```
+
 ## Versions
 
-all Mautic 5 Docker images follow the following naming stategy.
+all Mautic 7 Docker images follow the following naming stategy.
 
 `<major.minor.patch>-<variant>`
 
@@ -18,9 +24,9 @@ There are some defaults if parts are omitted:
 
 some examples:
 
-* `5-apache`: latest stable version of Mautic 5 of the `apache` variant
-* `5.0-fpm`: latest version in the 5.0 minor release in the `fpm` variant 
-* `5.0.3-apache`: specific point release of the `apache` variant
+* `7-apache`: latest stable version of Mautic 7 of the `apache` variant
+* `7.0-fpm`: latest version in the 7.0 minor release in the `fpm` variant 
+* `7.0.3-apache`: specific point release of the `apache` variant
 
 ## Variants
 
@@ -73,8 +79,8 @@ The `examples` folder contains examples of `docker-compose` setups that use the 
 You can build your own images easily using the `docker build` command in the root of this directory:
 
 ```
-docker build . -f Dockerfile.apache -t librecodecoop/mautic:5-apache
-docker build . -f Dockerfile.fpm -t librecodecoop/mautic:5-fpm
+docker build . -f Dockerfile.apache -t librecodecoop/mautic:7-apache
+docker build . -f Dockerfile.fpm -t librecodecoop/mautic:7-fpm
 ```
 
 ## Persistent storage
@@ -119,6 +125,14 @@ You can get all available environments looking at a docker-compose.yml file that
 
  - `DOCKER_MAUTIC_ROLE`: which role does the container has to perform.  
    Defaults to `mautic_web`, other supported values are `mautic_worker` and `mautic_cron`.
+ - `MAUTIC_AUTO_INSTALL`: when `true`, the web container runs `mautic:install` automatically on first boot.  
+   Defaults to `false`.
+ - `MAUTIC_FORCE_INSTALL`: when `true`, the web container clears any partial local install state and runs `mautic:install` again.  
+   Defaults to `false`.
+ - `MAUTIC_SITE_URL`: site URL passed to the installer.  
+   Defaults to `http://localhost`.
+ - `MAUTIC_ADMIN_FIRSTNAME`, `MAUTIC_ADMIN_LASTNAME`, `MAUTIC_ADMIN_USERNAME`, `MAUTIC_ADMIN_EMAIL`, `MAUTIC_ADMIN_PASSWORD`: admin account fields used by the automated install.  
+   Defaults are `Admin`, `Mautic`, `admin`, `admin@example.com`, and `ChangeMe123!`.
  - `DOCKER_MAUTIC_LOAD_TEST_DATA`: should the test data be loaded on start or not.  
    Defaults to `false`, other supported value is `true`.  
    This variable is only usable when using the `web` role.
@@ -141,10 +155,35 @@ Technically, every setting of Mautic you can set via the UI or via the `local.ph
 e.g. the `messenger_dsn_hit` can be set via the `MAUTIC_MESSENGER_DSN_HIT` environment variable.  
 See the general Mautic documentation for more info.
 
+#### Automated installation
+
+To install Mautic without using the browser installer, set `MAUTIC_AUTO_INSTALL=true` and provide the DB/admin variables through your environment or `.env` file.
+
+Example:
+
+```env
+MAUTIC_AUTO_INSTALL=true
+MAUTIC_FORCE_INSTALL=true
+MAUTIC_SITE_URL=http://localhost
+MAUTIC_ADMIN_FIRSTNAME=Admin
+MAUTIC_ADMIN_LASTNAME=Mautic
+MAUTIC_ADMIN_USERNAME=admin
+MAUTIC_ADMIN_EMAIL=admin@example.com
+MAUTIC_ADMIN_PASSWORD=ChangeMe123!
+```
+
+Use `MAUTIC_FORCE_INSTALL=true` on the first boot when you want to skip the browser installer entirely, or when you are reusing a volume that already contains a partial install state.
+
+This repository also tracks the CRM bundle as a git submodule under `volumes/mautic/docroot/plugins/MauticCrmBundle`. If you clone the repository manually, initialize submodules before starting the stack:
+
+```bash
+git submodule update --init --recursive
+```
+
 ### Customization
 
 Currently this image has no easy way to extend Mautic (e.g. adding extra `composer` dependencies or installing extra plugins or themes).  
-This is an ongoing effort we hope to support in an upcoming 5.x release.  
+This is an ongoing effort we hope to support in an upcoming 7.x release.  
   
 
 For now, please build your own images based on the official ones to add the needed dependencies, plugins and themes.

@@ -3,7 +3,7 @@ x-mautic-volumes: &mautic-volumes
   - ./volumes/cron:/opt/mautic/cron:z
 
 x-mautic-environments: &mautic-environments
-  MAUTIC_VERSION: ${MAUTIC_VERSION:-5.x-dev}
+  MAUTIC_VERSION: ${MAUTIC_VERSION:-7.x-dev}
   TZ: ${TZ:-CET}
   HOST_UID: ${HOST_UID:-1000}
   HOST_GID: ${HOST_GID:-1000}
@@ -12,6 +12,18 @@ x-mautic-environments: &mautic-environments
   MAUTIC_DB_USER: ${MAUTIC_DB_USER:-mautic}
   MAUTIC_DB_PASSWORD: ${MAUTIC_DB_PASSWORD:-mautic}
   MAUTIC_DB_NAME: ${MAUTIC_DB_NAME:-mautic}
+  MAUTIC_DB_DATABASE: ${MAUTIC_DB_DATABASE:-mautic}
+  MAUTIC_DB_TABLE_PREFIX: ${MAUTIC_DB_TABLE_PREFIX:-}
+  MAUTIC_DB_BACKUP_TABLES: ${MAUTIC_DB_BACKUP_TABLES:-true}
+  MAUTIC_DB_BACKUP_PREFIX: ${MAUTIC_DB_BACKUP_PREFIX:-bak_}
+  MAUTIC_AUTO_INSTALL: ${MAUTIC_AUTO_INSTALL:-false}
+  MAUTIC_FORCE_INSTALL: ${MAUTIC_FORCE_INSTALL:-false}
+  MAUTIC_SITE_URL: ${MAUTIC_SITE_URL:-http://localhost}
+  MAUTIC_ADMIN_FIRSTNAME: ${MAUTIC_ADMIN_FIRSTNAME:-Admin}
+  MAUTIC_ADMIN_LASTNAME: ${MAUTIC_ADMIN_LASTNAME:-Mautic}
+  MAUTIC_ADMIN_USERNAME: ${MAUTIC_ADMIN_USERNAME:-admin}
+  MAUTIC_ADMIN_EMAIL: ${MAUTIC_ADMIN_EMAIL:-admin@example.com}
+  MAUTIC_ADMIN_PASSWORD: ${MAUTIC_ADMIN_PASSWORD:-ChangeMe123!}
   MAUTIC_RUN_CRON_JOBS: ${MAUTIC_RUN_CRON_JOBS:-true}
   XDEBUG_CONFIG: ${XDEBUG_CONFIG:-}
   MAUTIC_MESSENGER_DSN_EMAIL: ${MAUTIC_MESSENGER_DSN_EMAIL:-doctrine://default}
@@ -19,7 +31,7 @@ x-mautic-environments: &mautic-environments
 
 services:
   mautic_web:
-    image: ghcr.io/librecodecoop/mautic:${MAUTIC_VERSION:-5.x-dev}-${IMAGE_TYPE:-apache}
+    image: ghcr.io/librecodecoop/mautic:${MAUTIC_VERSION:-7.x-dev}-${IMAGE_TYPE:-apache}
     # build:
     #   context: .docker/
     #   dockerfile: Dockerfile.${IMAGE_TYPE:-apache}
@@ -37,7 +49,7 @@ services:
       retries: 100
 
   mautic_cron:
-    image: ghcr.io/librecodecoop/mautic:${MAUTIC_VERSION:-5.x-dev}-${IMAGE_TYPE:-apache}
+    image: ghcr.io/librecodecoop/mautic:${MAUTIC_VERSION:-7.x-dev}-${IMAGE_TYPE:-apache}
     # build:
     #   context: .docker/
     #   dockerfile: Dockerfile.${IMAGE_TYPE:-apache}
@@ -51,7 +63,7 @@ services:
         condition: service_healthy
 
   mautic_worker:
-    image: ghcr.io/librecodecoop/mautic:${MAUTIC_VERSION:-5.x-dev}-${IMAGE_TYPE:-apache}
+    image: ghcr.io/librecodecoop/mautic:${MAUTIC_VERSION:-7.x-dev}-${IMAGE_TYPE:-apache}
     # build:
     #   context: .docker/
     #   dockerfile: Dockerfile.${IMAGE_TYPE:-apache}

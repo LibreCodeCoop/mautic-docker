@@ -1,0 +1,20 @@
+# use this file for environment variables that can be used.
+# see https://docs.mautic.org/en/7.x/
+
+MAUTIC_DB_HOST="${MYSQL_HOST}"
+MAUTIC_DB_PORT="${MYSQL_PORT}"
+MAUTIC_DB_DATABASE="${MYSQL_DATABASE}"
+MAUTIC_DB_USER="${MYSQL_USER}"
+MAUTIC_DB_PASSWORD="${MYSQL_PASSWORD}"
+
+MAUTIC_MESSENGER_DSN_EMAIL="doctrine://default"
+MAUTIC_MESSENGER_DSN_HIT="doctrine://default"
+
+MAUTIC_AUTO_INSTALL="false"
+MAUTIC_FORCE_INSTALL="false"
+MAUTIC_SITE_URL="http://localhost"
+MAUTIC_ADMIN_FIRSTNAME="Admin"
+MAUTIC_ADMIN_LASTNAME="Mautic"
+MAUTIC_ADMIN_USERNAME="admin"
+MAUTIC_ADMIN_EMAIL="admin@example.com"
+MAUTIC_ADMIN_PASSWORD="ChangeMe123!"
