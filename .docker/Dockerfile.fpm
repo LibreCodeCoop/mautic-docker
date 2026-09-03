@@ -2,6 +2,7 @@ FROM php:8.3-fpm
 
 LABEL vendor="Mautic"
 LABEL maintainer="LibreCode coop"
+LABEL org.opencontainers.image.source="https://github.com/LibreCodeCoop/mautic-docker"
 
 # hadolint ignore=DL3008
 RUN apt-get update && apt-get install --no-install-recommends -y \
