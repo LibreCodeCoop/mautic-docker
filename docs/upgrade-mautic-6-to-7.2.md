@@ -59,7 +59,14 @@ After syncing the tree into the live volume, run the asset install step inside t
 docker compose exec -T mautic_web php bin/console assets:install docroot --no-interaction
 ```
 
-On the upgrade we validated, the login page still hung until we removed a stale
+If the login page still loads without CSS or if `/assets/build/*` returns 404,
+run the production asset generator too:
+
+```bash
+docker compose exec -T mautic_web php bin/console mautic:assets:generate
+```
+
+On the upgrade we validated, the login page also hung until we removed a stale
 `docroot/media/generation_in_progress.txt` lock file and fixed the ownership of
 `var/cache/prod` back to `www-data:www-data`. If the page keeps timing out after
 the sync, check those two paths first.
@@ -102,3 +109,4 @@ You want to see:
 - no remaining migration failures in the logs
 - the cron jobs can resolve the database connection without `SQLSTATE[HY000] [2002] No such file or directory`
 - the login page returns `200` or a normal redirect instead of hanging on asset generation
+- the login page loads CSS from `/assets/build/css/app-*.css`
