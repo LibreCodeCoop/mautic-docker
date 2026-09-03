@@ -24,6 +24,8 @@ Keep the runtime data that belongs to the installation, not to the codebase:
 
 If you already keep additional local overrides, back those up before syncing the tree.
 
+Make sure `config/local.php` contains `site_url`. The `mautic_worker` and `mautic_cron` entrypoints wait for that key before starting.
+
 ## Recommended flow
 
 1. Stop the Mautic services.
