@@ -42,7 +42,7 @@ Each variant contains:
 * the needed dependencies to run Mautic (e.g. PHP modules)
 * the Mautic codebase installed via composer (see mautic/recommended-project)
 * the needed files and configuration to run as a specific role
-* xdebug, npm and composer
+* xdebug and composer
 
 See the `examples` explanation below how you could use them.
 

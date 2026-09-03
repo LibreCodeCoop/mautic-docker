@@ -127,7 +127,7 @@ fi
 
 # run migrations
 if [ "$DOCKER_MAUTIC_RUN_MIGRATIONS" = "true" ]; then
-	su -s /bin/bash www-data -c 'php /var/www/html/bin/console doctrine:migration:migrate -n'
+	su -s /bin/bash www-data -c 'php /var/www/html/bin/console doctrine:migrations:migrate -n'
 fi
 
 # execute the provided entrypoint
