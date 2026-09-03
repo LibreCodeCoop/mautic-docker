@@ -28,6 +28,12 @@ some examples:
 * `7.0-fpm`: latest version in the 7.0 minor release in the `fpm` variant 
 * `7.0.3-apache`: specific point release of the `apache` variant
 
+## Upgrading
+
+If you run Mautic with `/var/www/html` mounted as a persistent volume, upgrading from Mautic 6.x to 7.x also requires refreshing the application tree inside that volume.
+
+See [`docs/upgrade-mautic-6-to-7.2.md`](docs/upgrade-mautic-6-to-7.2.md) for the validated procedure and the MariaDB migration edge case we hit during the 6.0.7 to 7.2 upgrade.
+
 ## Variants
 
 The Docker images exist in 2 variants:
