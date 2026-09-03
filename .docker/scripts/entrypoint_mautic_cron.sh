@@ -60,8 +60,13 @@ crontab -u www-data /opt/mautic/cron/mautic
 mkfifo /tmp/stdout
 chmod 777 /tmp/stdout
 
-# ensure the PHP env vars are present during cronjobs
-declare -p | grep 'PHP_INI_VALUE_' > /tmp/cron.env
+# ensure the PHP env vars and database settings are present during cronjobs
+# The cron daemon does not reliably inherit the container environment into each job,
+# so the jobs need an explicit shell environment.
+{
+	declare -p | grep -E '^(declare -x (PHP_INI_VALUE_|MAUTIC_DB_|MAUTIC_SITE_URL))'
+	printf '%s\n' 'if [ -n "${MAUTIC_DB_NAME:-}" ] && [ -z "${MAUTIC_DB_DATABASE:-}" ]; then export MAUTIC_DB_DATABASE="$MAUTIC_DB_NAME"; fi'
+} > /tmp/cron.env
 
 # wait until Mautic is installed
 # shellcheck disable=SC2016
