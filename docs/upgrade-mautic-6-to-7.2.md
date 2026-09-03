@@ -26,6 +26,8 @@ If you already keep additional local overrides, back those up before syncing the
 
 Make sure `config/local.php` contains `site_url`. The `mautic_worker` and `mautic_cron` entrypoints wait for that key before starting.
 
+Also make sure the cron environment exports the database variables used by the jobs. In particular, the running container must expose both `MAUTIC_DB_NAME` and the `MAUTIC_DB_DATABASE` alias so commands like `mautic:segments:update` do not fall back to a broken default connection.
+
 ## Recommended flow
 
 1. Stop the Mautic services.
@@ -87,3 +89,4 @@ You want to see:
 - `Mautic 7.2.0`
 - the `mautic_web` container healthy
 - no remaining migration failures in the logs
+- the cron jobs can resolve the database connection without `SQLSTATE[HY000] [2002] No such file or directory`
