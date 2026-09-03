@@ -53,6 +53,17 @@ docker run --rm -u 0:0 --entrypoint sh \
 
 The Composer scaffold may try to run `npm ci` during a post-update step. That is not required for the PHP application tree itself, because Mautic 7.2 ships with the frontend assets already built.
 
+After syncing the tree into the live volume, run the asset install step inside the web container:
+
+```bash
+docker compose exec -T mautic_web php bin/console assets:install docroot --no-interaction
+```
+
+On the upgrade we validated, the login page still hung until we removed a stale
+`docroot/media/generation_in_progress.txt` lock file and fixed the ownership of
+`var/cache/prod` back to `www-data:www-data`. If the page keeps timing out after
+the sync, check those two paths first.
+
 ## Sync
 
 After the tree is generated, sync it into the mounted volume:
@@ -90,3 +101,4 @@ You want to see:
 - the `mautic_web` container healthy
 - no remaining migration failures in the logs
 - the cron jobs can resolve the database connection without `SQLSTATE[HY000] [2002] No such file or directory`
+- the login page returns `200` or a normal redirect instead of hanging on asset generation
