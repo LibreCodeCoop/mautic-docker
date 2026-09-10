@@ -65,6 +65,9 @@ chmod 777 /tmp/stdout
 # so the jobs need an explicit shell environment.
 {
 	declare -p | grep -E '^(declare -x (PHP_INI_VALUE_|MAUTIC_DB_|MAUTIC_SITE_URL))'
+	# Written verbatim to /tmp/cron.env and evaluated by the cron job, so the
+	# variables must NOT be expanded here.
+	# shellcheck disable=SC2016
 	printf '%s\n' 'if [ -n "${MAUTIC_DB_NAME:-}" ] && [ -z "${MAUTIC_DB_DATABASE:-}" ]; then export MAUTIC_DB_DATABASE="$MAUTIC_DB_NAME"; fi'
 } > /tmp/cron.env
 
