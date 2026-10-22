@@ -4,8 +4,6 @@ on:
   pull_request:
     branches:
       - main
-  schedule:
-    - cron: '23 4 * * *'
   push:
     branches:
       - main
@@ -91,7 +89,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           pull: true
-          push: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') || inputs.publish }}
+          push: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') || inputs.publish == true }}
           context: .docker
           platforms: linux/amd64,linux/arm64
           file: .docker/Dockerfile.${{ matrix.image_type }}
